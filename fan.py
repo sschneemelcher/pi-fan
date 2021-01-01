@@ -18,9 +18,9 @@ while True:
         on = ((20-(100-on))/20)*10**-1
         for _ in range(10):
             fan.on()
-            sleep(on*3)
+            sleep(on)
             fan.off()
-            sleep((0.1-on)*3)
+            sleep(0.05)
         on*=1000
     with open("/home/<user>/log/fan_speed","w") as f:
         f.write(str(int(on))+"%")
