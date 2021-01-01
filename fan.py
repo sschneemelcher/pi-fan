@@ -11,15 +11,16 @@ while True:
         fan.on()
         sleep(1)
     elif on<80:
+        on=0
         fan.off()
         sleep(1)
     else:
         on = ((20-(100-on))/20)*10**-1
         for _ in range(10):
             fan.on()
-            sleep(on)
+            sleep(on*3)
             fan.off()
-            sleep((0.1-on))
+            sleep((0.1-on)*3)
         on*=1000
     with open("/home/<user>/log/fan_speed","w") as f:
         f.write(str(int(on))+"%")
