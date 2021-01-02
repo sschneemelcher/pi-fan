@@ -2,26 +2,27 @@ from gpiozero import LED
 from time import sleep
 
 fan = LED(17)
-temp_max = int(open("/home/<user>/.config/fan/config","r").read())
+temp_max=int(open("/home/<user>/.config/fan/config","r").read())
+
+threshold = 0.4
+count = 0
+
+def run_fan(on):
+    if on < 1:
+        fan.off()
+        sleep((1-on)*0.05)
+    if on > 0.5:
+        fan.on()
+        sleep(on*0.05)
+
 
 while True:
-    temp = int(open("/sys/class/thermal/thermal_zone0/temp","r").read()) // 1000 * 1000
-    on = min(temp/(temp_max*10),100)
-    if on>=100:
-        fan.on()
-        sleep(1)
-    elif on<80:
-        on=0
-        fan.off()
-        sleep(1)
-    else:
-        on = ((20-(100-on))/20)*10**-1
-        for _ in range(10):
-            fan.on()
-            sleep(on)
-            fan.off()
-            sleep(0.05)
-        on*=1000
-    with open("/home/<user>/log/fan_speed","w") as f:
-        f.write(str(int(on))+"%")
-
+    temp = int(open("/sys/class/thermal/thermal_zone0/temp","r").read())
+    on = min((temp)/(temp_max*10**3),1)
+    on = ((threshold-(1-on))/threshold)
+    run_fan(on)
+    count+=1
+    if count >= 100:
+        with open("/home/<user>/log/fan_speed","w") as f:
+            f.write(str(max(int(200*(on-0.5)),0))+"%")
+        count=0
